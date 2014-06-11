@@ -19,19 +19,19 @@ module.exports = function (app, passport) {
 
   // use local strategy
   passport.use(new LocalStrategy({
-      usernameField: 'email',
+      usernameField: 'username-email',
       passwordField: 'password'
     },
-    function(email, password, done) {
+    function(username_or_email, password, done) {
 
-      User.findOne( { email: email } , function (err, user) {
+      User.findOne({ $or: [{ email: username_or_email }, { username: username_or_email }] } , function (err, user) {
 
         if (err) {
           return done(err)
         }
 
         if (!user) {
-          return done(null, false, { message: 'Your email not register' })
+          return done(null, false, { message: 'Your email or username is not registered' })
         }
 
         if (!user.authenticate(password)) {
